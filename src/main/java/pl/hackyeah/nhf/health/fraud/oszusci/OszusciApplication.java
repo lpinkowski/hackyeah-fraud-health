@@ -24,10 +24,16 @@ public class OszusciApplication {
     public static void main(String[] args) {
         SpringApplication.run(OszusciApplication.class, args);
         List<ICD10ServiceImpl.RozpoznanieRelativeIncrease> rozpoznanieRelativeIncreases = service.przyrostyRozpoznanRokDoRoku();
-
+        
         rozpoznanieRelativeIncreases.forEach(OszusciApplication::output);
-
+        
         System.out.println(format("Rows processed -> %d ", rozpoznanieRelativeIncreases.size()));
+
+        service.costam(rozpoznanieRelativeIncreases).forEach(OszusciApplication::output);
+    }
+
+    private static void output(ICD10ServiceImpl.Costam costam) {
+        System.out.println(format("ICD10: [%s] -  Year: [%d] - JGP kod: [%s] \n", costam.getIcd10(), costam.getYear(), costam.getJgpKod()));
     }
 
     @PostConstruct
