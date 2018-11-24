@@ -39,8 +39,8 @@ public class ICD10ServiceImpl implements ICD10Service {
         rezpoznanieRelativeIcreases.sort(Comparator.comparing(RozpoznanieRelativeIncrease::getRelativeIncrease).reversed());
 
         return rezpoznanieRelativeIcreases.stream()
-                //.filter(r->r.getRelativeIncrease()<=2)
-                .limit(100)
+                .filter(r->r.getRelativeIncrease()>1.2)
+                .limit(5000)
                 .collect(Collectors.toList());
     }
 
