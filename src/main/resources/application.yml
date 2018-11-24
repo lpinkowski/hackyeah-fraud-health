@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}/hackyeah-fraud-health
-    username: mysql
-    password: mysql
+    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}/health?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: Password123
     tomcat:
       max-active: 5
       test-on-borrow: true
