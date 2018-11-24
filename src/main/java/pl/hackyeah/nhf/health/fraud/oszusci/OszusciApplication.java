@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 import pl.hackyeah.nhf.health.fraud.oszusci.icd10.ICD10Service;
 import pl.hackyeah.nhf.health.fraud.oszusci.icd10.ICD10ServiceImpl;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieWithJPGGroup;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -24,11 +23,11 @@ public class OszusciApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(OszusciApplication.class, args);
-        List<RozpoznanieWithJPGGroup> przyrostyRozpoznanRokDoRoku = service.przyrostyRozpoznanRokDoRoku();
+        List<ICD10ServiceImpl.RozpoznanieRelativeIncrease> rozpoznanieRelativeIncreases = service.przyrostyRozpoznanRokDoRoku();
 
-        przyrostyRozpoznanRokDoRoku.forEach(OszusciApplication::output);
+        rozpoznanieRelativeIncreases.forEach(OszusciApplication::output);
 
-        System.out.println(format("Rows processed -> %d ", przyrostyRozpoznanRokDoRoku.size()));
+        System.out.println(format("Rows processed -> %d ", rozpoznanieRelativeIncreases.size()));
     }
 
     @PostConstruct
@@ -36,7 +35,7 @@ public class OszusciApplication {
         service = icd10Service;
     }
 
-    private static void output(RozpoznanieWithJPGGroup g) {
-        System.out.println(format("ID: [%s] -  Year: [%d] - No. of cases: [%d] \n", g.getICD10(), g.getYear(), g.getNumberOfCases()));
+    private static void output(ICD10ServiceImpl.RozpoznanieRelativeIncrease g) {
+        System.out.println(format("ID: [%s] -  Year: [%d] - Relative Increses: [%s] \n", g.getICD10(), g.getYear(), g.getRelativeIncrease()));
     }
 }
