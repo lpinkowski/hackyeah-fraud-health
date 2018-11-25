@@ -1,4 +1,4 @@
-package pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain;
+package pl.hackyeah.nhf.health.fraud.detector.icd10.domain;
 
 import lombok.Getter;
 
@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 @Getter
 public class Fraud {
     public static List<String> HEADER = asList("ICD10", "YEAR", "JGP_CODE", "ACTUAL_GROWTH", "RELATIVE_INCREASE");
+    
     private String jgpCode;
     private String icd10;
     private int year;

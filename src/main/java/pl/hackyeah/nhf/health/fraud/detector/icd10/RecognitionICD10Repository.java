@@ -1,16 +1,16 @@
-package pl.hackyeah.nhf.health.fraud.oszusci.icd10;
+package pl.hackyeah.nhf.health.fraud.detector.icd10;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RecognitionWithJPGGroup;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.AggregatedAverageValueGroupByICD10CodeYear;
+import org.springframework.stereotype.Repository;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.domain.AggregatedAverageValueGroupByICD10CodeYear;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.domain.RecognitionWithJPGGroup;
 
 import java.util.List;
 
-@Component
+@Repository
 @RequiredArgsConstructor
-public class RozpoznaniaICD10Repository implements Repo {
+public class RecognitionICD10Repository implements Repo {
 
     private final JdbcTemplate jdbcTemplate;
 

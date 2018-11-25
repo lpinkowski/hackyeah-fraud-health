@@ -1,4 +1,4 @@
-package pl.hackyeah.nhf.health.fraud.oszusci;
+package pl.hackyeah.nhf.health.fraud.detector;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OszusciApplicationTests {
+public class FraudDetectorApplicationTests {
 
 	@Test
 	public void contextLoads() {

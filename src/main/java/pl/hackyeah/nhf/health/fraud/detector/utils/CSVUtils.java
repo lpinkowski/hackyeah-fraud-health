@@ -1,4 +1,4 @@
-package pl.hackyeah.nhf.health.fraud.oszusci.utils;
+package pl.hackyeah.nhf.health.fraud.detector.utils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -8,26 +8,20 @@ public class CSVUtils {
 
     private static final char DEFAULT_SEPARATOR = ',';
 
-    public static void writeLine(Writer w, List<String> values) throws IOException {
-        writeLine(w, values, DEFAULT_SEPARATOR, ' ');
-    }
-
     public static void writeLine(Writer w, List<String> values, char separators) throws IOException {
         writeLine(w, values, separators, ' ');
     }
 
     //https://tools.ietf.org/html/rfc4180
     private static String followCVSformat(String value) {
-
         String result = value;
         if (result.contains("\"")) {
             result = result.replace("\"", "\"\"");
         }
         return result;
-
     }
 
-    public static void writeLine(Writer w, List<String> values, char separators, char customQuote) throws IOException {
+    private static void writeLine(Writer w, List<String> values, char separators, char customQuote) throws IOException {
 
         boolean first = true;
 

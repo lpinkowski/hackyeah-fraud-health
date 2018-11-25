@@ -1,15 +1,15 @@
-package pl.hackyeah.nhf.health.fraud.oszusci;
+package pl.hackyeah.nhf.health.fraud.detector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.ICD10Service;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.ICD10ServiceImpl;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.Fraud;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieRelativeIncrease;
-import pl.hackyeah.nhf.health.fraud.oszusci.utils.CSVLine;
-import pl.hackyeah.nhf.health.fraud.oszusci.utils.CSVUtils;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.ICD10Service;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.ICD10ServiceImpl;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.domain.Fraud;
+import pl.hackyeah.nhf.health.fraud.detector.icd10.domain.RecognitionRelativeIncrease;
+import pl.hackyeah.nhf.health.fraud.detector.utils.CSVLine;
+import pl.hackyeah.nhf.health.fraud.detector.utils.CSVUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.FileWriter;
@@ -21,7 +21,7 @@ import static java.lang.String.format;
 
 @SpringBootApplication
 @Component
-public class OszusciApplication {
+public class FraudDetectorApplication {
 
     private static ICD10Service service;
 
@@ -34,17 +34,15 @@ public class OszusciApplication {
     }
 
     public static void main(String[] args) throws IOException {
-        SpringApplication.run(OszusciApplication.class, args);
+        SpringApplication.run(FraudDetectorApplication.class, args);
 
         System.out.println("Processing - Relative Increases");
-        List<RozpoznanieRelativeIncrease> foundRelativeIncreases = service.findRelativeIncreaseYearToYear();
-        foundRelativeIncreases.forEach(OszusciApplication::output);
+        List<RecognitionRelativeIncrease> foundRelativeIncreases = service.findRelativeIncreaseYearToYear();
         exportRelativeIncrease(foundRelativeIncreases);
         System.out.println(format("Rows processed -> %d ", foundRelativeIncreases.size()));
 
         System.out.println("Processing... - suspicious to confirmed");
         List<Fraud> fraudList = service.findFraud(foundRelativeIncreases);
-        fraudList.forEach(OszusciApplication::output);
         exportFraud(fraudList);
         System.out.println(format("Rows processed -> %d ", fraudList.size()));
     }
@@ -56,19 +54,11 @@ public class OszusciApplication {
         exportDataToCSV(csvData, Fraud.HEADER, "Frauds");
     }
 
-    private static void output(Fraud fraud) {
-        System.out.println(format("ICD10: [%s] -  Year: [%d] - JGP_Code: [%s] \n", fraud.getIcd10(), fraud.getYear(), fraud.getJgpCode()));
-    }
-
-    private static void output(RozpoznanieRelativeIncrease g) {
-        System.out.println(format("ID: [%s] -  Year: [%d] - Relative Increses: [%s] \n", g.getICD10(), g.getYear(), g.getRelativeIncrease()));
-    }
-
-    private static void exportRelativeIncrease(final List<RozpoznanieRelativeIncrease> data) throws IOException {
+    private static void exportRelativeIncrease(final List<RecognitionRelativeIncrease> data) throws IOException {
         List<String> csvData = data.stream()
                 .map(CSVLine::asLine)
                 .collect(Collectors.toList());
-        exportDataToCSV(csvData, RozpoznanieRelativeIncrease.HEADER, "RelativeIncrease");
+        exportDataToCSV(csvData, RecognitionRelativeIncrease.HEADER, "RelativeIncrease");
     }
 
     private static void exportDataToCSV(final List<String> csvData, final List<String> header, String fileName) throws IOException {
