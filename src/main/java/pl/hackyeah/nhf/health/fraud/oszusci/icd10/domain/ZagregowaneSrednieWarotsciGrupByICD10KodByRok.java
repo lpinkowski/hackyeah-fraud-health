@@ -12,6 +12,4 @@ public class ZagregowaneSrednieWarotsciGrupByICD10KodByRok {
     String jgpKod;
 
     double sredniaArytmetycznaSredniejWartosciGrupy;
-
-    double liczbaWystapien;
 }

@@ -20,16 +20,22 @@ public class OszusciApplication {
 
     @Autowired
     private ICD10ServiceImpl icd10Service;
-
-    public static void main(String[] args) {
+    
+    public static void main(String[] args)  {
         SpringApplication.run(OszusciApplication.class, args);
         List<ICD10ServiceImpl.RozpoznanieRelativeIncrease> rozpoznanieRelativeIncreases = service.przyrostyRozpoznanRokDoRoku();
         
         rozpoznanieRelativeIncreases.forEach(OszusciApplication::output);
         
         System.out.println(format("Rows processed -> %d ", rozpoznanieRelativeIncreases.size()));
+        
+        
+        List<ICD10ServiceImpl.Costam> costamList = service.costam(rozpoznanieRelativeIncreases);
+        
+                
+        costamList.forEach(OszusciApplication::output);
 
-        service.costam(rozpoznanieRelativeIncreases).forEach(OszusciApplication::output);
+        System.out.println(format("Rows processed -> %d ", costamList.size()));
     }
 
     private static void output(ICD10ServiceImpl.Costam costam) {
