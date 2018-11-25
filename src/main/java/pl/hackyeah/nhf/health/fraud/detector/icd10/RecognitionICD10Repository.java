@@ -30,11 +30,13 @@ public class RecognitionICD10Repository implements Repo {
     public List<AggregatedAverageValueGroupByICD10CodeYear> getAggregatedAverageValueGroupByICD10CodeYearList(String recognitionCode, int year) {
         //@formatter:off
         return jdbcTemplate.query(
-                "SELECT w.Rok, jgp_kod, avg(w.srednia_wartosc_grupy) FROM (\n" +
-"SELECT r.Kod, jgp.Rok , jgp.kod as jgp_kod, jgp.srednia_wartosc_grupy, (jgp.Liczba_pacjentow * r.Udzial)/100 as liczba_wystapien FROM health.rozpoznania_icd10 as r \n" +
-"LEFT JOIN health.grupy_jgp as jgp \n" +
-"ON r.Id_zestawienia = jgp.Id_zestawienia where r.Kod = '"+recognitionCode+"' and jgp.rok in ("+(year-1)+","+year+")\n" +
-") as w where w.liczba_wystapien > 0.5 group by jgp_kod, w.Rok order by jgp_kod, Rok", (rs, rowNum)-> new AggregatedAverageValueGroupByICD10CodeYear( rs.getInt(1),rs.getString(2), rs.getDouble(3)));
+                "SELECT w.Rok, jgp_kod, avg(w.srednia_wartosc_grupy) " +
+                        "FROM (" +
+                        "SELECT r.Kod, jgp.Rok , jgp.kod as jgp_kod, jgp.srednia_wartosc_grupy, (jgp.Liczba_pacjentow * r.Udzial)/100 as liczba_wystapien FROM health.rozpoznania_icd10 as r " +
+                        "LEFT JOIN health.grupy_jgp as jgp " +
+                        "ON r.Id_zestawienia = jgp.Id_zestawienia where r.Kod = '"+recognitionCode+"' and jgp.rok in ("+(year-1)+","+year+")" +
+                        ") as w where w.liczba_wystapien > 0.5 "+ 
+                   "group by jgp_kod, w.Rok order by jgp_kod, Rok", (rs, rowNum)-> new AggregatedAverageValueGroupByICD10CodeYear( rs.getInt(1),rs.getString(2), rs.getDouble(3)));
         //@formatter:on
     }
 }
