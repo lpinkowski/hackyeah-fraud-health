@@ -8,8 +8,6 @@ import lombok.Data;
 public class ZagregowaneSrednieWarotsciGrupByICD10KodByRok {
 
     int rok;
-
     String jgpKod;
-
     double sredniaArytmetycznaSredniejWartosciGrupy;
 }

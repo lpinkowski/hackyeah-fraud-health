@@ -1,10 +1,13 @@
 package pl.hackyeah.nhf.health.fraud.oszusci.icd10;
 
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.Fraud;
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieRelativeIncrease;
+
 import java.util.List;
 
 public interface ICD10Service {
-    
-    List<ICD10ServiceImpl.RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku();
 
-    List<ICD10ServiceImpl.Costam> costam(List<ICD10ServiceImpl.RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku);
+    List<RozpoznanieRelativeIncrease> findRelativeIncreaseYearToYear();
+
+    List<Fraud> findFraud(List<RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku);
 }

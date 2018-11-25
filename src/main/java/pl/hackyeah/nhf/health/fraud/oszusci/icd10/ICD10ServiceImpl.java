@@ -1,8 +1,9 @@
 package pl.hackyeah.nhf.health.fraud.oszusci.icd10;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.Fraud;
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieRelativeIncrease;
 import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieWithJPGGroup;
 import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.ZagregowaneSrednieWarotsciGrupByICD10KodByRok;
 
@@ -12,14 +13,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @AllArgsConstructor
 public class ICD10ServiceImpl implements ICD10Service {
 
+    private static final double PERCENT_OF_JGP_VALUE_INCREASE = 1.15;
+    private static final double PERCENT_OF_DIAGNOSIS_INCREASED = 1.1;
+    private static final int CUT_OFF = 200;
+    private static final int ZERO = 0;
+
     private final Repo repo;
 
     @Override
-    public List<RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku() {
+    public List<RozpoznanieRelativeIncrease> findRelativeIncreaseYearToYear() {
         List<RozpoznanieWithJPGGroup> icd10WithJPGGroupByYears = repo.getICD10WithJPGGroupByYearsOrderByKodRok(); // we get it ordered by free
 
         String actualICD10 = null;
@@ -29,9 +37,9 @@ public class ICD10ServiceImpl implements ICD10Service {
             RozpoznanieRelativeIncrease result;
             if (actualICD10 == null || !actualICD10.equals(actualGroup.getICD10())) {
                 actualICD10 = actualGroup.getICD10();
-                result = new RozpoznanieRelativeIncrease(actualGroup, 0);
+                result = new RozpoznanieRelativeIncrease(actualGroup, ZERO);
             } else {
-                result = new RozpoznanieRelativeIncrease(actualGroup, previous.getNumberOfCases() > 200 ? (double) actualGroup.getNumberOfCases() / (double) previous.getNumberOfCases() : 0); //TODO te odciecie > 200 trzeba sparametryzowac
+                result = new RozpoznanieRelativeIncrease(actualGroup, previous.getNumberOfCases() > CUT_OFF ? (double) actualGroup.getNumberOfCases() / (double) previous.getNumberOfCases() : ZERO);
             }
             previous = actualGroup;
             rezpoznanieRelativeIcreases.add(result);
@@ -39,61 +47,47 @@ public class ICD10ServiceImpl implements ICD10Service {
         rezpoznanieRelativeIcreases.sort(Comparator.comparing(RozpoznanieRelativeIncrease::getRelativeIncrease).reversed());
 
         return rezpoznanieRelativeIcreases.stream()
-                .filter(r->r.getRelativeIncrease()>1.2).limit(5000)
-                .collect(Collectors.toList());
-    }
-
-    @Getter
-    public class RozpoznanieRelativeIncrease {
-
-        private String ICD10;
-
-        private int year;
-
-        double relativeIncrease;
-
-        public RozpoznanieRelativeIncrease(RozpoznanieWithJPGGroup actualGroup, double relativeIncrease) {
-            this.ICD10 = actualGroup.getICD10();
-            this.year = actualGroup.getYear();
-            this.relativeIncrease = relativeIncrease;
-        }
+                .filter(r -> r.getRelativeIncrease() > PERCENT_OF_DIAGNOSIS_INCREASED)
+                .collect(toList());
     }
 
 
-    public List<Costam> costam(List<RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku) {
-        List<Costam> confirmed = new ArrayList<>();
+    public List<Fraud> findFraud(List<RozpoznanieRelativeIncrease> przyrostyRozpoznanRokDoRoku) {
+        List<Fraud> confirmed = new ArrayList<>();
         for (RozpoznanieRelativeIncrease rozpoznanieRelativeIncrease : przyrostyRozpoznanRokDoRoku) {
             List<ZagregowaneSrednieWarotsciGrupByICD10KodByRok> podejrzanaLista = repo.getTutek(rozpoznanieRelativeIncrease.getICD10(), rozpoznanieRelativeIncrease.getYear());
 
             Map<String, List<ZagregowaneSrednieWarotsciGrupByICD10KodByRok>> collect = podejrzanaLista.stream().collect(Collectors.groupingBy(ZagregowaneSrednieWarotsciGrupByICD10KodByRok::getJgpKod));
-            List<Costam> confirmedList = collect.values().stream().filter(list -> {
-                if (list.size() > 1) {
-                    ZagregowaneSrednieWarotsciGrupByICD10KodByRok value1 = list.get(0);
-                    ZagregowaneSrednieWarotsciGrupByICD10KodByRok value2 = list.get(1);
-                    if (value1.getRok() < value2.getRok()) {
-                        return value1.getSredniaArytmetycznaSredniejWartosciGrupy() * 1.3 < value2.getSredniaArytmetycznaSredniejWartosciGrupy();
-                    } else {
-                        return value2.getSredniaArytmetycznaSredniejWartosciGrupy() * 1.3 < value1.getSredniaArytmetycznaSredniejWartosciGrupy();
-                    }
 
-                } else return false;
-            }).map(d -> new Costam(d.get(0).getJgpKod(), rozpoznanieRelativeIncrease.ICD10, Math.max(d.get(0).getRok(), d.get(1).getRok()))).collect(Collectors.toList());
+            List<Fraud> confirmedList = collect.values().stream()
+                    .filter(list -> {
+                        if (list.size() > 1) {
+                            ZagregowaneSrednieWarotsciGrupByICD10KodByRok value1 = list.get(0);
+                            ZagregowaneSrednieWarotsciGrupByICD10KodByRok value2 = list.get(1);
+                            if (value1.getRok() < value2.getRok()) {
+                                return value1.getSredniaArytmetycznaSredniejWartosciGrupy() * PERCENT_OF_JGP_VALUE_INCREASE < value2.getSredniaArytmetycznaSredniejWartosciGrupy();
+                            } else {
+                                return value2.getSredniaArytmetycznaSredniejWartosciGrupy() * PERCENT_OF_JGP_VALUE_INCREASE < value1.getSredniaArytmetycznaSredniejWartosciGrupy();
+                            }
+
+                        } else return false;
+                    })
+                    .map(d -> new Fraud(d.get(0).getJgpKod(), rozpoznanieRelativeIncrease.getICD10(), selectYear(d), actualGrowth(d.get(0), d.get(1)), rozpoznanieRelativeIncrease.getRelativeIncrease()))
+                    .collect(toList());
             confirmed.addAll(confirmedList);
         }
         return confirmed;
     }
 
+    private int selectYear(List<ZagregowaneSrednieWarotsciGrupByICD10KodByRok> d) {
+        return Math.max(d.get(0).getRok(), d.get(1).getRok());
+    }
 
-    @Getter
-    public class Costam {
-        private String jgpKod;
-        private String icd10;
-        private int year;
-
-        public Costam(String jgpKod, String icd10, int year) {
-            this.jgpKod = jgpKod;
-            this.icd10 = icd10;
-            this.year = year;
+    private double actualGrowth(ZagregowaneSrednieWarotsciGrupByICD10KodByRok value1, ZagregowaneSrednieWarotsciGrupByICD10KodByRok value2) {
+        if (value1.getRok() < value2.getRok()) {
+            return value2.getSredniaArytmetycznaSredniejWartosciGrupy() / value1.getSredniaArytmetycznaSredniejWartosciGrupy();
+        } else {
+            return value1.getSredniaArytmetycznaSredniejWartosciGrupy() / value2.getSredniaArytmetycznaSredniejWartosciGrupy();
         }
     }
 }
