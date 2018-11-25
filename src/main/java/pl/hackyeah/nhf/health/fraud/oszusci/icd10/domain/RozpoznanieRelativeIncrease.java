@@ -18,7 +18,7 @@ public class RozpoznanieRelativeIncrease implements CSVLine {
 
     double relativeIncrease;
 
-    public RozpoznanieRelativeIncrease(RozpoznanieWithJPGGroup actualGroup, double relativeIncrease) {
+    public RozpoznanieRelativeIncrease(RecognitionWithJPGGroup actualGroup, double relativeIncrease) {
         this.ICD10 = actualGroup.getICD10();
         this.year = actualGroup.getYear();
         this.relativeIncrease = relativeIncrease;

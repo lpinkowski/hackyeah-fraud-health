@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ZagregowaneSrednieWarotsciGrupByICD10KodByRok {
+public class AggregatedAverageValueGroupByICD10CodeYear {
 
     int rok;
     String jgpKod;

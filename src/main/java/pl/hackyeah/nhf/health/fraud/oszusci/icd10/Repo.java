@@ -1,11 +1,12 @@
 package pl.hackyeah.nhf.health.fraud.oszusci.icd10;
 
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RozpoznanieWithJPGGroup;
-import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.ZagregowaneSrednieWarotsciGrupByICD10KodByRok;
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.AggregatedAverageValueGroupByICD10CodeYear;
+import pl.hackyeah.nhf.health.fraud.oszusci.icd10.domain.RecognitionWithJPGGroup;
 
 import java.util.List;
 
 public interface Repo {
-    List<RozpoznanieWithJPGGroup> getICD10WithJPGGroupByYearsOrderByKodRok();
-    List<ZagregowaneSrednieWarotsciGrupByICD10KodByRok> getTutek(String kodRozpoznania, int rok);
+    List<RecognitionWithJPGGroup> getICD10WithJPGGroupByYearsOrderByCodeYearList();
+
+    List<AggregatedAverageValueGroupByICD10CodeYear> getAggregatedAverageValueGroupByICD10CodeYearList(String recognitionCode, int year);
 }

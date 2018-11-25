@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RozpoznanieWithJPGGroup {
+public class RecognitionWithJPGGroup {
     
     String ICD10;
     int year;
