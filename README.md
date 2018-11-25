@@ -15,6 +15,9 @@ tar xf database_data/health.tar.xz
 2. Install the MySQL GUI tools and open your SQL file, then execute it
 3. Use phpmysql if the database is available via your webserver
 
+### DB connection configuration
+DB connection configuration is available in `application.yaml` file
+
 ##Docker.
 Application provide docker file which contains MySQL DB configured.
 To use docker MySQL:
