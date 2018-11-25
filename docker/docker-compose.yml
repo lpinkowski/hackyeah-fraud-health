@@ -1,0 +1,9 @@
+version: '3'
+services:
+  health-mysql:
+    environment:
+      - right="WRITE"
+      - MYSQL_ROOT_PASSWORD=pwd
+    image: mysql
+    ports:
+      - "3306:3306"
